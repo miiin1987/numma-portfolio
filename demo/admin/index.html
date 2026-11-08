@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="LINE AI Chatbot デモ管理画面 — みどりペット。FAQの追加・編集・削除と応答テストが体験できます。">
+<title>LINE AI Bot デモ管理画面 | みどりペット | ぬっまポートフォリオ</title>
+<style>
+:root{
+  --cream:#fcfaf5;--white:#ffffff;--ivory:#f7f2eb;--pink:#f4ede8;
+  --sage:#567d6d;--sage-dk:#3d5c52;--sage-lt:#eaf2ed;
+  --ink:#2d3a35;--muted:#6b7c75;--border:#dfe8e3;
+  --sh:0 2px 20px rgba(45,58,53,.07);--sh-h:0 8px 36px rgba(45,58,53,.12);
+  --r:20px;--r-sm:12px;
+  --warn:#e8961f;--warn-lt:#fffbf0;--warn-bd:#f5d680;
+  --err:#d94f4f;--err-lt:#fff5f5;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:system-ui,-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+  line-height:1.75;font-size:15px}
+a{color:inherit;text-decoration:none}
+
+/* ── Demo banner ── */
+.demo-banner{
+  background:var(--warn-lt);border-bottom:2px solid var(--warn-bd);
+  padding:10px 20px;font-size:12.5px;color:#6b4b00;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demo-pill{background:var(--warn);color:#fff;font-size:11px;font-weight:800;
+  padding:2px 9px;border-radius:100px;letter-spacing:.05em;flex-shrink:0}
+
+/* ── Header ── */
+.site-header{background:var(--white);border-bottom:1px solid var(--border)}
+.hd-inner{max-width:1200px;margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;gap:14px;min-height:58px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;color:var(--ink)}
+.brand-mark{display:inline-flex;width:30px;height:30px;background:var(--sage);
+  color:#fff;border-radius:7px;align-items:center;justify-content:center;
+  font-size:15px;font-style:italic}
+.hd-sep{color:var(--border);font-size:18px}
+.hd-title{font-size:13.5px;color:var(--muted);font-weight:500;flex:1;min-width:0}
+.btn-back{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;
+  color:var(--sage);border:1px solid var(--border);border-radius:100px;
+  padding:6px 14px;transition:.18s;white-space:nowrap;flex-shrink:0}
+.btn-back:hover{background:var(--sage-lt);border-color:var(--sage)}
+
+/* ── Layout ── */
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 56px}
+.page-hd{margin-bottom:18px}
+.page-hd h1{font-size:19px;margin:0 0 5px;display:flex;align-items:center;
+  gap:10px;flex-wrap:wrap;line-height:1.5}
+.demo-label{font-size:11.5px;background:var(--pink);color:#b05040;
+  padding:3px 10px;border-radius:100px;font-weight:700}
+.page-hd p{font-size:13px;color:var(--muted);margin:0}
+
+/* Info box */
+.info-box{background:var(--sage-lt);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:14px 16px;font-size:13px;color:var(--muted);
+  display:flex;gap:12px;align-items:flex-start;line-height:1.75;margin-bottom:22px}
+.info-box strong{color:var(--ink)}
+.info-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+
+.two-col{display:grid;grid-template-columns:1fr 390px;gap:18px;margin-bottom:18px;align-items:start}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+
+/* ── Panel ── */
+.panel{background:var(--white);border:1px solid var(--border);border-radius:var(--r)}
+.panel-hd{padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  flex-wrap:wrap;background:var(--ivory);border-radius:var(--r) var(--r) 0 0}
+.panel-hd h2{font-size:14.5px;margin:0;display:flex;align-items:center;gap:8px}
+.panel-hd-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.panel-body{padding:18px 20px}
+
+.cbadge{font-size:11px;font-weight:700;background:var(--sage-lt);color:var(--sage);
+  padding:2px 8px;border-radius:100px}
+.cbadge.full{background:var(--pink);color:#b05040}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;
+  border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;border:none;
+  font-family:inherit;transition:.18s;text-decoration:none;white-space:nowrap}
+.btn-p{background:var(--sage);color:#fff}
+.btn-p:hover{background:var(--sage-dk)}
+.btn-p:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-g:hover{background:var(--ivory);border-color:var(--muted)}
+.btn-d{background:transparent;color:var(--err);border:1px solid #fcc}
+.btn-d:hover{background:var(--err-lt)}
+.btn-sm{font-size:12px;padding:5px 11px}
+.btn-xs{font-size:11.5px;padding:4px 9px}
+
+/* ── Form ── */
+.form-box{background:var(--sage-lt);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:16px;margin-bottom:16px}
+.form-box h3{font-size:13px;margin:0 0 13px;color:var(--sage-dk)}
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
+.fg input,.fg textarea{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);
+  border-radius:10px;font-size:14px;font-family:inherit;color:var(--ink);
+  background:var(--white);resize:vertical;transition:border-color .18s;line-height:1.6}
+.fg input:focus,.fg textarea:focus{outline:none;border-color:var(--sage)}
+.fg input.err,.fg textarea.err{border-color:var(--err)}
+.cc{font-size:11px;color:var(--muted);text-align:right;margin-top:3px}
+.cc.over{color:var(--err)}
+.form-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+
+/* ── FAQ list ── */
+.faq-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+.fi{border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:12px 14px;margin-bottom:9px;transition:box-shadow .15s;background:var(--white)}
+.fi:last-child{margin-bottom:0}
+.fi.off{opacity:.52}
+.fi:hover{box-shadow:var(--sh)}
+.fi-q{font-size:13.5px;font-weight:700;line-height:1.5;word-break:break-all;margin-bottom:5px}
+.fi-q::before{content:'Q. ';color:var(--sage)}
+.fi-a{font-size:12.5px;color:var(--muted);line-height:1.6;word-break:break-all;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin-bottom:9px}
+.fi-acts{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+
+/* ── Toggle ── */
+.tog{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+  background:#ccc;border-radius:20px;transition:.2s}
+.tog-track::before{content:'';position:absolute;width:14px;height:14px;
+  left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.tog input:checked+.tog-track{background:var(--sage)}
+.tog input:checked+.tog-track::before{transform:translateX(16px)}
+.tog-lbl{font-size:11px;color:var(--muted)}
+
+/* ── Chat ── */
+.sim-notice{
+  background:var(--warn-lt);border:1px solid var(--warn-bd);
+  border-radius:var(--r-sm);padding:10px 13px;font-size:12px;color:#6b4b00;
+  display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;line-height:1.6}
+.chat-area{
+  height:300px;overflow-y:auto;border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:12px;background:var(--ivory);
+  display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+.msg{max-width:88%;padding:9px 12px;border-radius:16px;
+  font-size:13px;line-height:1.6;word-break:break-word}
+.msg.u{background:var(--white);border:1px solid var(--border);align-self:flex-end;
+  border-radius:16px 16px 4px 16px}
+.msg.b{background:var(--sage);color:#fff;align-self:flex-start;
+  border-radius:16px 16px 16px 4px}
+.msg.b.na{background:var(--muted)}
+.msg.s{max-width:100%;background:rgba(255,255,255,.65);border:1px dashed var(--border);
+  color:var(--muted);font-size:11.5px;align-self:center;border-radius:9px;
+  text-align:center;padding:6px 12px}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row input{flex:1;padding:10px 14px;border:1.5px solid var(--border);
+  border-radius:100px;font-size:14px;font-family:inherit;color:var(--ink);
+  outline:none;transition:border-color .18s;min-width:0}
+.chat-input-row input:focus{border-color:var(--sage)}
+.chat-sub{font-size:11.5px;color:var(--muted);margin-top:7px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+button.chat-clear{background:none;border:none;color:var(--muted);
+  font-size:11.5px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0}
+button.chat-clear:hover{color:var(--ink)}
+
+/* ── Unanswered ── */
+.unans-chips{display:flex;flex-wrap:wrap;gap:7px}
+.uc{background:var(--ivory);border:1px solid var(--border);
+  border-radius:100px;padding:5px 13px;font-size:12.5px;color:var(--ink)}
+.unans-empty{font-size:13px;color:var(--muted)}
+
+/* ── Modal ── */
+#modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.38);z-index:900;align-items:center;justify-content:center}
+#modal.on{display:flex}
+.modal-box{background:var(--white);border-radius:var(--r);padding:28px 24px;
+  max-width:360px;width:90%;box-shadow:var(--sh-h)}
+.modal-box h3{margin:0 0 10px;font-size:17px}
+.modal-box p{font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.75}
+.modal-acts{display:flex;gap:10px;justify-content:flex-end}
+
+/* ── Toast ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;
+  display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--ink);color:#fff;padding:9px 16px;border-radius:10px;
+  font-size:13px;animation:tIn .25s ease,tOut .25s ease 2s forwards}
+.toast.ok{background:var(--sage)}
+.toast.ng{background:var(--err)}
+@keyframes tIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tOut{from{opacity:1}to{opacity:0}}
+
+/* Footer */
+.demo-footer{border-top:1px solid var(--border);padding:20px;
+  text-align:center;font-size:12px;color:var(--muted);background:var(--ivory)}
+
+@media(max-width:540px){
+  .wrap{padding:14px 14px 48px}
+  .chat-area{height:240px}
+  .panel-hd{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Demo banner ── -->
+<div class="demo-banner">
+  <span class="demo-pill">DEMO</span>
+  <span><strong>デモ環境</strong> — 本番Supabaseには接続していません。LINE APIは呼び出されません。FAQデータはこのブラウザ（localStorage）にのみ保存され、訪問者ごとに独立しています。</span>
+</div>
+
+<!-- ── Header ── -->
+<header class="site-header">
+  <div class="hd-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">n.</span>
+      <span>ぬっま</span>
+    </a>
+    <span class="hd-sep">/</span>
+    <span class="hd-title">Work 01 — LINE AI Bot デモ管理画面</span>
+    <a class="btn-back" href="/">← ポートフォリオに戻る</a>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<div class="wrap">
+  <div class="page-hd">
+    <h1>
+      <span>🐾</span>みどりペット — LINE Bot 管理画面
+      <span class="demo-label">デモ</span>
+    </h1>
+    <p>FAQを追加・編集してからチャットで応答を確認できます。データはブラウザに保存されます（最大20件）。</p>
+  </div>
+
+  <div class="info-box">
+    <span class="info-ico">ℹ️</span>
+    <div>
+      <strong>このデモについて</strong><br>
+      Work 01「LINE AI Chatbot」の管理画面を再現したデモです。実際のシステムではFAQをSupabaseに保存し、LINE Messaging APIで応答しています。デモ版ではFAQをブラウザのlocalStorageで管理し、AI応答はキーワードマッチングでシミュレートしています（<strong>実際のAI推論は行っていません</strong>）。
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- ── FAQ管理 ── -->
+    <div class="panel">
+      <div class="panel-hd">
+        <h2>📋 FAQ管理 <span class="cbadge" id="cnt">0 / 20</span></h2>
+        <div class="panel-hd-acts">
+          <button class="btn btn-g btn-sm" onclick="confirmReset()">🔄 初期化</button>
+          <button class="btn btn-p btn-sm" id="add-btn" onclick="startAdd()">＋ FAQ追加</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <!-- Form -->
+        <div class="form-box" id="form-box" style="display:none">
+          <h3 id="form-title">FAQ追加</h3>
+          <div class="fg">
+            <label>質問文 <span style="font-weight:400;color:var(--muted)">（最大100文字）</span></label>
+            <input type="text" id="f-q" maxlength="100" placeholder="例：営業時間を教えてください"
+              oninput="countChars('f-q','cc-q',100)">
+            <div class="cc" id="cc-q">0 / 100</div>
+          </div>
+          <div class="fg">
+            <label>回答文 <span style="font-weight:400;color:var(--muted)">（最大500文字）</span></label>
+            <textarea id="f-a" maxlength="500" rows="4"
+              placeholder="例：毎日10:00〜19:00営業しております。年末年始は休業です。"
+              oninput="countChars('f-a','cc-a',500)"></textarea>
+            <div class="cc" id="cc-a">0 / 500</div>
+          </div>
+          <div class="form-acts">
+            <button class="btn btn-g btn-sm" onclick="cancelForm()">キャンセル</button>
+            <button class="btn btn-p btn-sm" onclick="saveFAQ()">保存する</button>
+          </div>
+        </div>
+        <!-- List -->
+        <div id="faq-list"></div>
+      </div>
+    </div>
+
+    <!-- ── Chat test ── -->
+    <div class="panel">
+      <div class="panel-hd">
+        <h2>💬 応答テスト</h2>
+      </div>
+      <div class="panel-body">
+        <div class="sim-notice">
+          <span>⚠️</span>
+          <div>
+            <strong>AI応答のシミュレーション</strong><br>
+            実際のAI推論は行っていません。有効なFAQのキーワードマッチングで動作します。FAQを追加するとチャットの回答に即時反映されます。
+          </div>
+        </div>
+        <div class="chat-area" id="chat-area"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-in" placeholder="質問を入力..." maxlength="200"
+            onkeydown="handleChatKey(event)">
+          <button class="btn btn-p" onclick="send()">送信</button>
+        </div>
+        <div class="chat-sub">
+          <span style="font-size:11px;color:var(--muted)">Enterキーでも送信できます</span>
+          <button class="chat-clear" onclick="clearChat()">チャットをクリア</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Unanswered ── -->
+  <div class="panel">
+    <div class="panel-hd">
+      <h2>❓ 未回答質問ログ
+        <span style="font-size:11px;color:var(--muted);font-weight:400">（このブラウザのセッション中）</span>
+      </h2>
+      <button class="btn btn-g btn-sm" onclick="clearUnans()">クリア</button>
+    </div>
+    <div class="panel-body">
+      <p style="font-size:12.5px;color:var(--muted);margin:0 0 12px;line-height:1.75">
+        FAQで回答できなかった質問が記録されます。実際のシステムでは担当者への引き継ぎ通知に活用します。
+      </p>
+      <div class="unans-chips" id="unans"></div>
+    </div>
+  </div>
+</div>
+
+<footer class="demo-footer">
+  <a href="/" style="color:var(--sage)">← ぬっまポートフォリオに戻る</a>
+  &nbsp;｜&nbsp;
+  Work 01「LINE AI Chatbot」デモ管理画面（架空ペットショップ みどりペット）
+</footer>
+
+<!-- ── Reset confirm modal ── -->
+<div id="modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>FAQを初期化しますか？</h3>
+    <p>現在のFAQをすべて削除し、みどりペットのサンプルFAQ（5件）に戻します。この操作は元に戻せません。</p>
+    <div class="modal-acts">
+      <button class="btn btn-g" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-p" onclick="doReset()">初期化する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ── Constants ──────────────────────────────────────────
+const LS_FAQ   = 'midori_faq_v1';
+const LS_UNANS = 'midori_unans_v1';
+const MAX   = 20;
+const Q_LIM = 100;
+const A_LIM = 500;
+
+// サンプルFAQ（みどりペット）
+const DEFAULTS = [
+  {id:1, q:'営業時間を教えてください', a:'毎日10:00〜19:00営業しております。年末年始（12/31〜1/2）は休業となります。', on:true},
+  {id:2, q:'トリミングの予約はできますか', a:'はい、お電話またはLINEで承っております。3日前までにご予約をお願いいたします。', on:true},
+  {id:3, q:'ペットホテルの料金を教えてください', a:'小型犬・猫3,500円〜、中型犬5,000円〜（1泊）となります。大型犬・連泊については別途お問い合わせください。', on:true},
+  {id:4, q:'どんな動物を取り扱っていますか', a:'犬・猫・小動物（ハムスター・うさぎ等）・鳥類・熱帯魚を取り扱っております。お探しの生体についてはお気軽にご相談ください。', on:true},
+  {id:5, q:'ワクチン証明書は必要ですか', a:'ペットホテルご利用の場合、混合ワクチン接種証明書（1年以内のもの）が必要です。ご来店前にご準備をお願いします。', on:true},
+];
+
+let editId = null;
+
+// ── Storage ────────────────────────────────────────────
+function lsGet(k) {
+  try { const d = localStorage.getItem(k); return d ? JSON.parse(d) : null; }
+  catch { return null; }
+}
+function lsSet(k, v) {
+  try { localStorage.setItem(k, JSON.stringify(v)); }
+  catch { toast('データ保存に失敗しました（プライベートモードでは保存できません）', 'ng'); }
+}
+function getFAQs()  { return lsGet(LS_FAQ)   || deepCopy(DEFAULTS); }
+function setFAQs(f) { lsSet(LS_FAQ, f); }
+function getUnans() { return lsGet(LS_UNANS) || []; }
+function setUnans(u){ lsSet(LS_UNANS, u); }
+function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
+function nextId(faqs){ return faqs.length ? Math.max(...faqs.map(f => f.id)) + 1 : 1; }
+
+// ── XSS escape ─────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+// ── Render FAQ list ────────────────────────────────────
+function render() {
+  const faqs  = getFAQs();
+  const badge = document.getElementById('cnt');
+  badge.textContent = `${faqs.length} / ${MAX}`;
+  badge.className = 'cbadge' + (faqs.length >= MAX ? ' full' : '');
+  document.getElementById('add-btn').disabled = faqs.length >= MAX;
+
+  const list = document.getElementById('faq-list');
+  if (!faqs.length) {
+    list.innerHTML = '<div class="faq-empty">FAQがありません。「FAQ追加」ボタンで追加してください。</div>';
+    return;
+  }
+  list.innerHTML = faqs.map(f => `
+    <div class="fi${f.on ? '' : ' off'}" id="fi-${f.id}">
+      <div class="fi-q">${esc(f.q)}</div>
+      <div class="fi-a">${esc(f.a)}</div>
+      <div class="fi-acts">
+        <label class="tog" title="${f.on ? '無効にする' : '有効にする'}">
+          <input type="checkbox" ${f.on ? 'checked' : ''} onchange="toggleFAQ(${f.id})">
+          <span class="tog-track"></span>
+        </label>
+        <span class="tog-lbl">${f.on ? '有効' : '無効'}</span>
+        <button class="btn btn-g btn-xs" onclick="startEdit(${f.id})">編集</button>
+        <button class="btn btn-d btn-xs" onclick="delFAQ(${f.id})">削除</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── FAQ CRUD ───────────────────────────────────────────
+function startAdd() {
+  editId = null;
+  document.getElementById('form-title').textContent = 'FAQ追加';
+  document.getElementById('f-q').value = '';
+  document.getElementById('f-a').value = '';
+  countChars('f-q', 'cc-q', Q_LIM);
+  countChars('f-a', 'cc-a', A_LIM);
+  document.getElementById('form-box').style.display = 'block';
+  document.getElementById('f-q').focus();
+}
+
+function startEdit(id) {
+  const f = getFAQs().find(x => x.id === id);
+  if (!f) return;
+  editId = id;
+  document.getElementById('form-title').textContent = 'FAQ編集';
+  document.getElementById('f-q').value = f.q;
+  document.getElementById('f-a').value = f.a;
+  countChars('f-q', 'cc-q', Q_LIM);
+  countChars('f-a', 'cc-a', A_LIM);
+  document.getElementById('form-box').style.display = 'block';
+  document.getElementById('form-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('f-q').focus();
+}
+
+function cancelForm() {
+  editId = null;
+  document.getElementById('form-box').style.display = 'none';
+  ['f-q', 'f-a'].forEach(id => document.getElementById(id).classList.remove('err'));
+}
+
+function saveFAQ() {
+  const q = document.getElementById('f-q').value.trim();
+  const a = document.getElementById('f-a').value.trim();
+  document.getElementById('f-q').classList.remove('err');
+  document.getElementById('f-a').classList.remove('err');
+
+  if (!q) { document.getElementById('f-q').classList.add('err'); toast('質問文を入力してください', 'ng'); return; }
+  if (!a) { document.getElementById('f-a').classList.add('err'); toast('回答文を入力してください', 'ng'); return; }
+  if (q.length > Q_LIM) { document.getElementById('f-q').classList.add('err'); toast(`質問文は${Q_LIM}文字以内にしてください`, 'ng'); return; }
+  if (a.length > A_LIM) { document.getElementById('f-a').classList.add('err'); toast(`回答文は${A_LIM}文字以内にしてください`, 'ng'); return; }
+
+  let faqs = getFAQs();
+  if (editId !== null) {
+    faqs = faqs.map(f => f.id === editId ? { ...f, q, a } : f);
+    toast('FAQを更新しました', 'ok');
+  } else {
+    if (faqs.length >= MAX) { toast(`FAQは最大${MAX}件までです`, 'ng'); return; }
+    faqs.push({ id: nextId(faqs), q, a, on: true });
+    toast('FAQを追加しました', 'ok');
+  }
+  setFAQs(faqs);
+  cancelForm();
+  render();
+}
+
+function delFAQ(id) {
+  setFAQs(getFAQs().filter(f => f.id !== id));
+  render();
+  toast('FAQを削除しました');
+}
+
+function toggleFAQ(id) {
+  setFAQs(getFAQs().map(f => f.id === id ? { ...f, on: !f.on } : f));
+  render();
+}
+
+function confirmReset() { document.getElementById('modal').classList.add('on'); }
+function closeModal()    { document.getElementById('modal').classList.remove('on'); }
+
+function doReset() {
+  setFAQs(deepCopy(DEFAULTS));
+  cancelForm();
+  render();
+  closeModal();
+  toast('サンプルFAQ 5件に初期化しました', 'ok');
+}
+
+// ── Chat / Response simulation ─────────────────────────
+function normalize(s) {
+  return s.toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[？?！!。、・〜～「」『』【】（）()]/g, '');
+}
+
+function findAnswer(input) {
+  const faqs = getFAQs().filter(f => f.on);
+  const n = normalize(input);
+  if (n.length < 2) return null;
+
+  // 1. Exact match
+  for (const f of faqs) {
+    if (normalize(f.q) === n) return f.a;
+  }
+
+  // 2. Substring match (input in FAQ question, or FAQ question in input)
+  for (const f of faqs) {
+    const fn = normalize(f.q);
+    if (n.length >= 3 && fn.includes(n)) return f.a;
+    if (fn.length >= 3 && n.includes(fn)) return f.a;
+  }
+
+  // 3. Sliding window keyword match (3〜8 char substrings from FAQ question)
+  for (const f of faqs) {
+    const fn = normalize(f.q);
+    if (fn.length < 3) continue;
+    const maxLen = Math.min(fn.length, 8);
+    for (let len = maxLen; len >= 3; len--) {
+      for (let i = 0; i <= fn.length - len; i++) {
+        if (n.includes(fn.slice(i, i + len))) return f.a;
+      }
+    }
+  }
+
+  return null;
+}
+
+function addMsg(text, cls) {
+  const area = document.getElementById('chat-area');
+  const d = document.createElement('div');
+  d.className = `msg ${cls}`;
+  d.textContent = text;
+  area.appendChild(d);
+  area.scrollTop = area.scrollHeight;
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) send();
+}
+
+function send() {
+  const inp  = document.getElementById('chat-in');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  addMsg(text, 'u');
+
+  setTimeout(() => {
+    const ans = findAnswer(text);
+    if (ans) {
+      addMsg(ans, 'b');
+    } else {
+      addMsg('申し訳ありません。ご質問の内容はFAQで対応できませんでした。担当スタッフにお繋ぎします。しばらくお待ちください。', 'b na');
+      addMsg('⚠️ 未回答として記録 — 実際のシステムでは担当者へ通知が送信されます（シミュレーション）', 's');
+      const u = getUnans();
+      if (!u.includes(text)) {
+        u.unshift(text);
+        if (u.length > 20) u.pop();
+        setUnans(u);
+        renderUnans();
+      }
+    }
+  }, 380);
+}
+
+function clearChat() {
+  document.getElementById('chat-area').innerHTML = '';
+  addWelcome();
+}
+
+function addWelcome() {
+  addMsg('みどりペット公式LINEへようこそ！よくある質問への回答はFAQから自動でお答えします。何でもお気軽にどうぞ。', 'b');
+}
+
+// ── Unanswered questions ───────────────────────────────
+function renderUnans() {
+  const u  = getUnans();
+  const el = document.getElementById('unans');
+  el.innerHTML = u.length
+    ? u.map(q => `<span class="uc">${esc(q)}</span>`).join('')
+    : '<span class="unans-empty">未回答の質問はまだありません</span>';
+}
+
+function clearUnans() { setUnans([]); renderUnans(); toast('未回答ログをクリアしました'); }
+
+// ── Utilities ──────────────────────────────────────────
+function countChars(inputId, countId, max) {
+  const v  = document.getElementById(inputId).value;
+  const el = document.getElementById(countId);
+  el.textContent = `${v.length} / ${max}`;
+  el.className   = 'cc' + (v.length > max ? ' over' : '');
+}
+
+function toast(msg, type) {
+  const c = document.getElementById('toasts');
+  const d = document.createElement('div');
+  d.className = 'toast' + (type ? ` ${type}` : '');
+  d.textContent = msg;
+  c.appendChild(d);
+  setTimeout(() => d.remove(), 2700);
+}
+
+// ── Init ───────────────────────────────────────────────
+(function init() {
+  if (!lsGet(LS_FAQ)) setFAQs(deepCopy(DEFAULTS));
+  render();
+  renderUnans();
+  addWelcome();
+})();
+</script>
+</body>
+</html>

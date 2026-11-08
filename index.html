@@ -500,7 +500,7 @@ const works = [
   {
     id:'01',
     title:'LINE AIチャットボット',
-    tags:[{label:'自主制作',cls:'tself'}],
+    tags:[{label:'自主制作',cls:'tself'},{label:'デモ公開中',cls:'tdemo'}],
     problem:'営業時間外・繰り返しの問い合わせに毎回対応している',
     visual:'chat',
     bg:'bg-sage',
@@ -511,7 +511,7 @@ const works = [
     ],
     tech:'LINE Messaging API / Next.js / Claude AI',
     github:'https://github.com/miiin1987/line-ai-bot',
-    demo:'',
+    demo:'/demo/admin/',
   },
   {
     id:'02',
@@ -646,7 +646,12 @@ const faqs = [
 
 // ── Render Works ──────────────────────────────────────────
 const escH = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const safeURL = s => /^https:\/\/[a-z0-9.-]+(?:\/[^\s]*)?$/i.test(String(s)) ? s : '';
+const safeURL = s => {
+  const str = String(s);
+  if (/^https:\/\/[a-z0-9.-]+(?:\/[^\s]*)?$/i.test(str)) return str;
+  if (/^\/[a-zA-Z0-9/_.-]+$/.test(str)) return str;
+  return '';
+};
 
 function buildVisual(w) {
   if (w.visual === 'chat') {
@@ -701,8 +706,7 @@ function renderWorks() {
       gh ? `<a class="btn-sm" href="${escH(gh)}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>` : '',
     ].filter(Boolean).join('');
     // visual label
-    const isRealData = w.visual === 'dashboard';
-    const vlabel = isRealData ? '仕組みのイメージ（デモ公開中）' : '仕組みのイメージ';
+    const vlabel = dm ? '仕組みのイメージ（デモ公開中）' : '仕組みのイメージ';
 
     return `<article class="wcard">
       <div class="wv ${w.bg||''}">
