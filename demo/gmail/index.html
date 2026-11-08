@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Gmail送信スクリプト（Python / Google OAuth 2.0）動作デモ — 実行シミュレーションとソースコード表示">
+<title>Gmail送信スクリプト デモ | Work 05 | ぬっまポートフォリオ</title>
+<style>
+:root{
+  --cream:#fcfaf5;--white:#fff;--ivory:#f7f2eb;--pink:#f4ede8;
+  --sage:#567d6d;--sage-dk:#3d5c52;--sage-lt:#eaf2ed;
+  --ink:#2d3a35;--muted:#6b7c75;--border:#dfe8e3;
+  --sh:0 2px 20px rgba(45,58,53,.07);--sh-h:0 8px 36px rgba(45,58,53,.12);
+  --r:20px;--r-sm:12px;
+  --warn:#e8961f;--warn-lt:#fffbf0;--warn-bd:#f5d680;
+  /* terminal theme */
+  --t-bg:#1a1b26;--t-hd:#24273a;--t-txt:#c8d3f5;--t-dim:#565f89;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:system-ui,-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+  line-height:1.75;font-size:15px}
+a{color:inherit;text-decoration:none}
+
+/* ── Banner ── */
+.demo-banner{background:var(--warn-lt);border-bottom:2px solid var(--warn-bd);
+  padding:10px 20px;font-size:12.5px;color:#6b4b00;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demo-pill{background:var(--warn);color:#fff;font-size:11px;font-weight:800;
+  padding:2px 9px;border-radius:100px;letter-spacing:.05em;flex-shrink:0}
+
+/* ── Header ── */
+.site-header{background:var(--white);border-bottom:1px solid var(--border)}
+.hd-inner{max-width:1200px;margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;gap:14px;min-height:58px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;color:var(--ink)}
+.brand-mark{display:inline-flex;width:30px;height:30px;background:var(--sage);color:#fff;
+  border-radius:7px;align-items:center;justify-content:center;font-size:15px;font-style:italic}
+.hd-sep{color:var(--border);font-size:18px}
+.hd-title{font-size:13.5px;color:var(--muted);font-weight:500;flex:1;min-width:0}
+.btn-back{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;
+  color:var(--sage);border:1px solid var(--border);border-radius:100px;
+  padding:6px 14px;transition:.18s;white-space:nowrap;flex-shrink:0}
+.btn-back:hover{background:var(--sage-lt);border-color:var(--sage)}
+
+/* ── Layout ── */
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 56px}
+.page-hd{margin-bottom:18px}
+.page-hd h1{font-size:19px;margin:0 0 5px;display:flex;align-items:center;
+  gap:10px;flex-wrap:wrap;line-height:1.5}
+.demo-label{font-size:11.5px;background:var(--pink);color:#b05040;
+  padding:3px 10px;border-radius:100px;font-weight:700}
+.page-hd p{font-size:13px;color:var(--muted);margin:0}
+
+/* Sim notice */
+.sim-notice{background:var(--warn-lt);border:1px solid var(--warn-bd);
+  border-radius:var(--r-sm);padding:11px 15px;font-size:12.5px;color:#6b4b00;
+  display:flex;gap:9px;align-items:flex-start;line-height:1.65;margin-bottom:20px}
+
+/* ── Two-column ── */
+.two-col{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-bottom:24px;align-items:start}
+@media(max-width:960px){.two-col{grid-template-columns:1fr}}
+
+/* ── Terminal ── */
+.term-wrap{background:var(--t-bg);border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--sh-h)}
+.term-hd{background:var(--t-hd);padding:11px 16px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.wdots{display:flex;gap:5px;flex-shrink:0}
+.wdots i{width:10px;height:10px;border-radius:50%;display:block}
+.wdots i:nth-child(1){background:#ff5f57}
+.wdots i:nth-child(2){background:#febc2e}
+.wdots i:nth-child(3){background:#28c840}
+.term-tabs{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+.tab{font-size:11.5px;padding:4px 11px;border-radius:6px;cursor:pointer;
+  background:transparent;border:1px solid var(--t-dim);color:var(--t-dim);
+  font-family:inherit;transition:.15s;white-space:nowrap}
+.tab:hover{border-color:var(--t-txt);color:var(--t-txt)}
+.tab.active{background:var(--t-txt);color:var(--t-bg);border-color:var(--t-txt);font-weight:700}
+.replay-btn{font-size:11.5px;padding:4px 11px;border-radius:6px;cursor:pointer;
+  background:transparent;border:1px solid #4ade80;color:#4ade80;
+  font-family:inherit;transition:.15s;white-space:nowrap;flex-shrink:0}
+.replay-btn:hover{background:#4ade8022}
+.term-body{padding:18px 20px;min-height:300px;max-height:420px;overflow-y:auto;
+  font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:13.5px;
+  line-height:1.9;color:var(--t-txt)}
+.term-body::-webkit-scrollbar{width:5px}
+.term-body::-webkit-scrollbar-thumb{background:var(--t-dim);border-radius:3px}
+/* terminal line types */
+.tl{display:block}
+.tl-cmd{color:#4ade80;font-weight:700}
+.tl-in{color:var(--t-txt)}
+.tl-ok{color:#4ade80;font-weight:700}
+.tl-ok2{color:#34d399}
+.tl-sys{color:#94a3b8;font-style:italic}
+.tl-warn{color:#fbbf24}
+.tl-url{color:#60a5fa;text-decoration:underline;word-break:break-all}
+.tl-info{color:#94a3b8}
+.cursor{display:inline-block;width:8px;height:14px;background:#4ade80;
+  vertical-align:text-bottom;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.sc-desc{font-size:12px;color:var(--t-dim);padding:8px 20px 12px;font-style:italic}
+
+/* ── Code viewer ── */
+.code-wrap{background:#1e2030;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-h)}
+.code-hd{background:#2f334d;padding:11px 16px;display:flex;align-items:center;gap:8px}
+.code-tab{font-size:12px;background:#1e2030;color:#c8d3f5;padding:5px 14px;
+  border-radius:6px 6px 0 0;border-bottom:2px solid #82aaff}
+.code-badge{font-size:10px;color:#565f89;margin-left:auto}
+.code-body{padding:14px 0;max-height:420px;overflow-y:auto;
+  font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:12.5px;
+  line-height:1.85;color:#c8d3f5}
+.code-body::-webkit-scrollbar{width:5px}
+.code-body::-webkit-scrollbar-thumb{background:#565f89;border-radius:3px}
+.cl{display:flex;gap:0;padding:0 16px}
+.cl:hover{background:rgba(255,255,255,.04)}
+.ln{color:#565f89;user-select:none;text-align:right;min-width:28px;
+  margin-right:16px;font-size:11.5px;flex-shrink:0}
+.lc{flex:1;white-space:pre}
+/* syntax colors */
+.sk{color:#c792ea}  /* keyword */
+.ss{color:#c3e88d}  /* string */
+.sc{color:#546e7a}  /* comment */
+.sb{color:#f78c6c}  /* builtin */
+.sf{color:#82aaff}  /* function name */
+.sn{color:#f78c6c}  /* number */
+
+/* ── Setup section ── */
+.section{background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px 28px;margin-bottom:20px}
+.section h2{font-size:16px;margin:0 0 20px;display:flex;align-items:center;gap:8px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{width:30px;height:30px;background:var(--sage-lt);color:var(--sage);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.7}
+.step-code{font-family:'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size:12px;background:var(--ivory);border:1px solid var(--border);
+  border-radius:6px;padding:5px 11px;display:inline-block;margin-top:5px;color:var(--ink)}
+.step-warn{font-size:11.5px;color:#b05040;background:var(--pink);
+  border-radius:6px;padding:3px 10px;display:inline-block;margin-top:5px}
+
+/* ── Tech section ── */
+.tech-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.tech-card{background:var(--ivory);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:10px 16px;display:flex;align-items:center;
+  gap:9px;font-size:13px}
+.tech-ico{font-size:20px;flex-shrink:0}
+.tech-name{font-weight:700;font-size:13px}
+.tech-ver{font-size:11px;color:var(--muted)}
+
+/* ── Footer ── */
+.demo-footer{border-top:1px solid var(--border);padding:20px;
+  text-align:center;font-size:12px;color:var(--muted);background:var(--ivory)}
+
+@media(max-width:600px){
+  .wrap{padding:14px 14px 48px}
+  .term-body{max-height:280px;font-size:12.5px}
+  .code-body{max-height:280px}
+  .term-hd{gap:6px}
+  .tab{font-size:10.5px;padding:3px 8px}
+  .section{padding:18px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Demo banner ── -->
+<div class="demo-banner">
+  <span class="demo-pill">DEMO</span>
+  <span><strong>実行シミュレーション</strong> — 実際のGmail APIには接続していません。架空のデータを使った動作イメージの再現です。認証情報・個人情報は一切含まれていません。</span>
+</div>
+
+<!-- ── Header ── -->
+<header class="site-header">
+  <div class="hd-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">n.</span>
+      <span>ぬっま</span>
+    </a>
+    <span class="hd-sep">/</span>
+    <span class="hd-title">Work 05 — Gmail メール送信スクリプト デモ</span>
+    <a class="btn-back" href="/">← ポートフォリオに戻る</a>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<div class="wrap">
+
+  <div class="page-hd">
+    <h1>
+      <span>📧</span>Gmail メール送信スクリプト
+      <span class="demo-label">デモ</span>
+    </h1>
+    <p>Python + Gmail API（OAuth 2.0）でCLIからメールを送信するスクリプトの動作イメージです。</p>
+  </div>
+
+  <div class="sim-notice">
+    <span>⚠️</span>
+    <div>
+      <strong>実行シミュレーション（実際のメール送信は行いません）</strong><br>
+      以下のターミナル表示は架空データによる動作再現です。Gmail APIへの接続・認証情報の読み込み・メール送信はいずれも行われていません。
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- ── Terminal ── -->
+    <div class="term-wrap">
+      <div class="term-hd">
+        <span class="wdots"><i></i><i></i><i></i></span>
+        <div class="term-tabs">
+          <button class="tab active" data-s="normal" onclick="switchScenario('normal')">① 通常送信</button>
+          <button class="tab" data-s="oauth" onclick="switchScenario('oauth')">② 初回OAuth認証</button>
+          <button class="tab" data-s="refresh" onclick="switchScenario('refresh')">③ トークン自動更新</button>
+        </div>
+        <button class="replay-btn" onclick="replay()">▶ 再生</button>
+      </div>
+      <div class="sc-desc" id="sc-desc">token.json が有効な状態でメールを送信</div>
+      <div class="term-body" id="term-body"></div>
+    </div>
+
+    <!-- ── Code viewer ── -->
+    <div class="code-wrap">
+      <div class="code-hd">
+        <span class="code-tab">send_gmail.py</span>
+        <span class="code-badge">Python · GitHub公開中</span>
+      </div>
+      <div class="code-body" id="code-body"></div>
+    </div>
+
+  </div>
+
+  <!-- ── Setup section ── -->
+  <div class="section">
+    <h2>🔧 セットアップ手順</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Google Cloud Console でプロジェクト作成</div>
+          <div class="step-desc">console.cloud.google.com でプロジェクトを作成し、<strong>Gmail API</strong> を有効化します。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">OAuth 2.0 クライアント ID を作成</div>
+          <div class="step-desc">「認証情報」→「OAuthクライアントID作成」→ アプリの種類：デスクトップアプリ を選択し、<code style="background:var(--ivory);padding:1px 6px;border-radius:4px;font-size:12px">credentials.json</code> をダウンロードしてスクリプトと同じディレクトリに配置します。</div>
+          <span class="step-warn">⚠️ credentials.json は絶対にリポジトリへコミットしないでください（.gitignore で除外済み）</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">依存パッケージをインストール</div>
+          <code class="step-code">pip install -r requirements.txt</code>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">スクリプトを実行</div>
+          <code class="step-code">python send_gmail.py</code>
+          <div class="step-desc" style="margin-top:7px">初回実行時はブラウザが起動しGoogleアカウント認証を求められます。認証後に <code style="background:var(--ivory);padding:1px 6px;border-radius:4px;font-size:12px">token.json</code> が自動生成され、次回以降は認証なしで実行できます。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tech section ── -->
+  <div class="section">
+    <h2>🛠 使用技術</h2>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <span class="tech-ico">🐍</span>
+        <div><div class="tech-name">Python 3</div><div class="tech-ver">言語</div></div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-ico">📧</span>
+        <div><div class="tech-name">Gmail API</div><div class="tech-ver">google-api-python-client 2.166.0</div></div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-ico">🔑</span>
+        <div><div class="tech-name">Google OAuth 2.0</div><div class="tech-ver">google-auth-oauthlib 1.2.1</div></div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-ico">🔄</span>
+        <div><div class="tech-name">自動トークン更新</div><div class="tech-ver">google-auth 2.38.0</div></div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-ico">📨</span>
+        <div><div class="tech-name">MIMEText</div><div class="tech-ver">標準ライブラリ（email.mime）</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="demo-footer">
+  <a href="/" style="color:var(--sage)">← ぬっまポートフォリオに戻る</a>
+  &nbsp;｜&nbsp;
+  Work 05「Gmail メール送信スクリプト」実行シミュレーションデモ
+</footer>
+
+<script>
+// ── Scenario data ─────────────────────────────────────
+const SCENARIOS = {
+  normal: {
+    desc: 'token.json が有効な状態でメールを送信',
+    lines: [
+      {t:'$ python send_gmail.py', c:'cmd', d:0},
+      {t:'', c:'blank', d:350},
+      {t:'宛先メールアドレス: tanaka@example.com', c:'in', d:500},
+      {t:'件名: 【ご案内】3月の定例ミーティングについて', c:'in', d:400},
+      {t:'本文: お疲れ様です。来週月曜13時からのミーティングをご確認ください。', c:'in', d:400},
+      {t:'', c:'blank', d:600},
+      {t:'メール送信成功', c:'ok', d:900},
+      {t:'Message ID: 1961abc2def34567', c:'info', d:120},
+    ]
+  },
+  oauth: {
+    desc: 'credentials.json から初回ブラウザ認証を実行',
+    lines: [
+      {t:'$ python send_gmail.py', c:'cmd', d:0},
+      {t:'', c:'blank', d:350},
+      {t:'token.json が見つかりません。初回認証を開始します...', c:'sys', d:600},
+      {t:'ブラウザを起動しています...', c:'sys', d:800},
+      {t:'Please visit this URL to authorize this application:', c:'warn', d:600},
+      {t:'https://accounts.google.com/o/oauth2/auth?access_type=offline&...（省略）', c:'url', d:200},
+      {t:'', c:'blank', d:1800},
+      {t:'Googleアカウントへのログインを確認しました', c:'sys', d:400},
+      {t:'token.json を保存しました', c:'sys', d:300},
+      {t:'', c:'blank', d:450},
+      {t:'宛先メールアドレス: yamada@example.com', c:'in', d:500},
+      {t:'件名: テスト送信', c:'in', d:400},
+      {t:'本文: Gmail APIからの送信テストです。', c:'in', d:400},
+      {t:'', c:'blank', d:600},
+      {t:'メール送信成功', c:'ok', d:900},
+      {t:'Message ID: 1962xyz9876abcde', c:'info', d:120},
+    ]
+  },
+  refresh: {
+    desc: '有効期限切れのトークンをリフレッシュして送信',
+    lines: [
+      {t:'$ python send_gmail.py', c:'cmd', d:0},
+      {t:'', c:'blank', d:350},
+      {t:'token.json を読み込みました', c:'sys', d:600},
+      {t:'アクセストークンの有効期限が切れています', c:'warn', d:400},
+      {t:'リフレッシュトークンを使用して自動更新中...', c:'sys', d:700},
+      {t:'トークン更新完了 ✓', c:'ok2', d:600},
+      {t:'', c:'blank', d:450},
+      {t:'宛先メールアドレス: sato@example.com', c:'in', d:500},
+      {t:'件名: 月次レポートの送付', c:'in', d:400},
+      {t:'本文: 今月の月次レポートを送付いたします。', c:'in', d:400},
+      {t:'', c:'blank', d:600},
+      {t:'メール送信成功', c:'ok', d:900},
+      {t:'Message ID: 1963lmno5678pqrs', c:'info', d:120},
+    ]
+  }
+};
+
+// ── Source code (send_gmail.py) ───────────────────────
+const SOURCE = `from __future__ import print_function
+import base64
+from email.mime.text import MIMEText
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+# Gmail送信権限
+SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+
+# ファイル名
+CREDENTIALS_FILE = "credentials.json"
+TOKEN_FILE = "token.json"
+
+
+def gmail_auth():
+
+    creds = None
+
+    # token.json が存在する場合
+    try:
+        creds = Credentials.from_authorized_user_file(
+            TOKEN_FILE,
+            SCOPES
+        )
+    except:
+        pass
+
+    # 初回認証 or 有効期限切れ
+    if not creds or not creds.valid:
+
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                CREDENTIALS_FILE,
+                SCOPES
+            )
+
+            creds = flow.run_local_server(port=0)
+
+        # token.json 保存
+        with open(TOKEN_FILE, "w") as token:
+            token.write(creds.to_json())
+
+    return creds
+
+
+def create_message(to, subject, body):
+
+    message = MIMEText(body)
+
+    message["to"] = to
+    message["subject"] = subject
+
+    raw = base64.urlsafe_b64encode(
+        message.as_bytes()
+    ).decode()
+
+    return {"raw": raw}
+
+
+def send_email(service, to, subject, body):
+
+    message = create_message(
+        to,
+        subject,
+        body
+    )
+
+    result = service.users().messages().send(
+        userId="me",
+        body=message
+    ).execute()
+
+    print("\\nメール送信成功")
+    print("Message ID:", result["id"])
+
+
+def main():
+
+    # Gmail認証
+    creds = gmail_auth()
+
+    # Gmail API 接続
+    service = build(
+        "gmail",
+        "v1",
+        credentials=creds
+    )
+
+    # 入力
+    to = input("宛先メールアドレス: ")
+    subject = input("件名: ")
+    body = input("本文: ")
+
+    # メール送信
+    send_email(
+        service,
+        to,
+        subject,
+        body
+    )
+
+
+if __name__ == "__main__":
+    main()`;
+
+// ── Terminal animation ─────────────────────────────────
+let gen = 0;
+let curScenario = 'normal';
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+async function runScenario(name) {
+  const myGen = ++gen;
+  const body = document.getElementById('term-body');
+  body.innerHTML = '';
+
+  const scenario = SCENARIOS[name];
+  const SPEED = {cmd:55, in:28, ok:0, ok2:0, sys:18, warn:18, url:12, info:0};
+
+  for (const line of scenario.lines) {
+    await sleep(line.d);
+    if (gen !== myGen) return;
+
+    if (line.c === 'blank') {
+      const br = document.createElement('div');
+      br.style.height = '4px';
+      body.appendChild(br);
+      continue;
+    }
+
+    const row = document.createElement('span');
+    row.className = `tl tl-${line.c}`;
+    body.appendChild(row);
+    body.appendChild(document.createElement('br'));
+
+    const spd = SPEED[line.c] ?? 20;
+    for (const ch of line.t) {
+      if (gen !== myGen) return;
+      row.textContent += ch;
+      body.scrollTop = body.scrollHeight;
+      if (spd > 0) await sleep(spd);
+    }
+    body.scrollTop = body.scrollHeight;
+  }
+
+  // Blinking cursor at end
+  if (gen === myGen) {
+    const cur = document.createElement('span');
+    cur.className = 'cursor';
+    body.appendChild(cur);
+  }
+}
+
+function switchScenario(name) {
+  curScenario = name;
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.s === name));
+  document.getElementById('sc-desc').textContent = SCENARIOS[name].desc;
+  runScenario(name);
+}
+
+function replay() {
+  runScenario(curScenario);
+}
+
+// ── Syntax highlighter ─────────────────────────────────
+function highlight(code) {
+  const KW = new Set(['from','import','def','return','if','else','elif',
+    'try','except','with','as','not','and','or','in','is',
+    'None','True','False','pass','class','for','while']);
+  const BI = new Set(['print','input','open','base64','super','len',
+    'range','str','int','bool','list','dict']);
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  let out = '';
+  let i = 0;
+
+  while (i < code.length) {
+    const ch = code[i];
+
+    // Comment
+    if (ch === '#') {
+      let end = code.indexOf('\n', i);
+      if (end < 0) end = code.length;
+      out += `<span class="sc">${esc(code.slice(i, end))}</span>`;
+      i = end;
+      continue;
+    }
+
+    // String (single-line, single or double quote)
+    if (ch === '"' || ch === "'") {
+      let j = i + 1;
+      while (j < code.length && code[j] !== ch && code[j] !== '\n') {
+        if (code[j] === '\\') j++;
+        j++;
+      }
+      if (j < code.length && code[j] === ch) j++;
+      out += `<span class="ss">${esc(code.slice(i, j))}</span>`;
+      i = j;
+      continue;
+    }
+
+    // Identifier / keyword / builtin / function name
+    if (/[a-zA-Z_]/.test(ch)) {
+      let j = i;
+      while (j < code.length && /[a-zA-Z0-9_]/.test(code[j])) j++;
+      const w = code.slice(i, j);
+      if (KW.has(w))       out += `<span class="sk">${esc(w)}</span>`;
+      else if (BI.has(w))  out += `<span class="sb">${esc(w)}</span>`;
+      else if (j < code.length && code[j] === '(') out += `<span class="sf">${esc(w)}</span>`;
+      else                 out += esc(w);
+      i = j;
+      continue;
+    }
+
+    // Number
+    if (/[0-9]/.test(ch)) {
+      let j = i;
+      while (j < code.length && /[0-9]/.test(code[j])) j++;
+      out += `<span class="sn">${esc(code.slice(i, j))}</span>`;
+      i = j;
+      continue;
+    }
+
+    out += esc(ch);
+    i++;
+  }
+
+  return out;
+}
+
+function renderCode() {
+  const hl = highlight(SOURCE);
+  const lines = hl.split('\n');
+  document.getElementById('code-body').innerHTML = lines.map((line, i) =>
+    `<div class="cl"><span class="ln">${i + 1}</span><span class="lc">${line || ' '}</span></div>`
+  ).join('');
+}
+
+// ── Init ───────────────────────────────────────────────
+renderCode();
+runScenario('normal');
+</script>
+</body>
+</html>
