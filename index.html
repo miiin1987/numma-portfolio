@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="AIを活用した業務効率化・自動化システムの自主制作ポートフォリオ。問い合わせ対応・資料検索・データ整理など、繰り返しの業務を仕組みで解決します。">
+<title>ぬっま | AIシステム開発・業務自動化</title>
+<style>
+:root{
+  --cream:#fcfaf5;--white:#ffffff;--ivory:#f7f2eb;--pink:#f4ede8;
+  --sage:#567d6d;--sage-dk:#3d5c52;--sage-lt:#eaf2ed;
+  --ink:#2d3a35;--muted:#6b7c75;--border:#dfe8e3;
+  --sh:0 2px 20px rgba(45,58,53,.07);--sh-h:0 8px 36px rgba(45,58,53,.12);
+  --r:20px;--r-sm:12px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:system-ui,-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+  line-height:1.85;font-size:15px}
+a{color:inherit}
+img{max-width:100%;height:auto;display:block}
+
+/* ── Utilities ── */
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+.section{padding:88px 0}
+.pale{background:var(--ivory)}
+.sage-pale{background:var(--sage-lt)}
+.pink-pale{background:var(--pink)}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.17em;
+  color:var(--sage);text-transform:uppercase;margin-bottom:10px}
+.sh{margin-bottom:52px}
+.sh.ctr{text-align:center}
+.sh h2{font-size:clamp(26px,3.5vw,38px);margin:8px 0 14px;line-height:1.45;letter-spacing:.03em}
+.sh h2 span{color:var(--sage)}
+.sh p{color:var(--muted);font-size:15px;max-width:600px}
+.sh.ctr p{margin:0 auto}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:13px 26px;
+  border-radius:100px;font-size:14px;font-weight:700;text-decoration:none;
+  transition:.2s;border:none;cursor:pointer;font-family:inherit}
+.btn-p{background:var(--sage);color:#fff}
+.btn-p:hover{background:var(--sage-dk);transform:translateY(-1px)}
+.btn-o{background:var(--white);color:var(--sage);border:1.5px solid var(--sage)}
+.btn-o:hover{background:var(--sage-lt)}
+.btn-sm{font-size:12.5px;padding:9px 16px;border:1px solid var(--border);
+  color:var(--sage);background:transparent;border-radius:var(--r-sm);
+  display:inline-flex;align-items:center;gap:5px;text-decoration:none;transition:.18s}
+.btn-sm:hover{background:var(--sage-lt);border-color:var(--sage)}
+
+/* ── HEADER ── */
+.site-header{position:sticky;top:0;z-index:100;
+  background:rgba(252,250,245,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:14px}
+.brand{text-decoration:none;display:flex;align-items:center;gap:10px;
+  font-weight:800;font-size:18px;flex-shrink:0;color:var(--ink)}
+.brand-mark{display:inline-flex;width:34px;height:34px;background:var(--sage);
+  color:#fff;border-radius:9px;align-items:center;justify-content:center;
+  font-size:17px;font-style:italic}
+.brand-sub{display:block;font-size:10px;font-weight:500;
+  color:var(--muted);letter-spacing:.1em}
+.nav-links{display:flex;align-items:center;gap:24px;font-size:13px}
+.nav-links a{text-decoration:none;color:var(--muted);transition:color .2s}
+.nav-links a:hover{color:var(--sage)}
+.nav-cta{margin-left:4px}
+.hmenu{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--ink);line-height:1}
+.hmenu svg{display:block}
+@media(max-width:860px){
+  .nav-links{display:none}
+  .nav-links.open{display:flex;flex-direction:column;position:fixed;
+    top:68px;left:0;right:0;background:var(--white);
+    border-bottom:1px solid var(--border);padding:20px 24px 28px;
+    gap:18px;z-index:99;font-size:15px;box-shadow:var(--sh-h)}
+  .nav-links.open .nav-cta{margin-left:0}
+  .hmenu{display:block}
+}
+
+/* ── HERO ── */
+.hero{padding:100px 0 88px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:480px;height:480px;
+  background:var(--sage-lt);border-radius:50%;right:-160px;top:-200px;pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center}
+.hero-copy .eyebrow{margin-bottom:16px}
+.hero-copy h1{font-size:clamp(28px,4vw,50px);line-height:1.5;letter-spacing:.03em;margin:0 0 22px}
+.hero-copy h1 em{font-style:normal;color:var(--sage)}
+.hero-copy .lead{font-size:16px;color:var(--muted);max-width:500px;margin:0 0 32px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.hero-note{font-size:12px;color:var(--muted)}
+/* hero visual */
+.hero-visual{background:var(--white);border:1px solid var(--border);
+  border-radius:24px;box-shadow:var(--sh-h);overflow:hidden}
+.hv-header{background:var(--ivory);padding:13px 18px;display:flex;align-items:center;
+  gap:8px;border-bottom:1px solid var(--border)}
+.wdots{display:flex;gap:6px}
+.wdots i{width:10px;height:10px;border-radius:50%;list-style:none}
+.wdots i:nth-child(1){background:#f5b8b0}
+.wdots i:nth-child(2){background:#f5d9b0}
+.wdots i:nth-child(3){background:#b0d5b0}
+.wdots+span{font-size:12px;color:var(--muted);margin-left:4px}
+.hv-body{padding:22px 20px}
+.hv-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hv-node{flex:1;min-width:68px;text-align:center;background:var(--sage-lt);
+  border-radius:14px;padding:14px 8px}
+.hv-node .ico{font-size:24px;display:block;margin-bottom:5px}
+.hv-node b{font-size:11px;display:block}
+.hv-arr{color:var(--sage);font-weight:700;font-size:17px;flex-shrink:0}
+.hv-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.hv-tags span{background:var(--ivory);border:1px solid var(--border);
+  border-radius:100px;padding:4px 11px;font-size:11px;color:var(--muted)}
+@media(max-width:768px){
+  .hero{padding:68px 0 56px}
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero::before{display:none}
+}
+
+/* ── PROBLEMS ── */
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.prob-card{background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:28px 22px;transition:box-shadow .2s}
+.prob-card:hover{box-shadow:var(--sh-h)}
+.prob-card .p-ico{font-size:28px;margin-bottom:12px;display:block}
+.prob-card h3{font-size:15px;margin:0 0 7px}
+.prob-card p{font-size:13px;color:var(--muted);margin:0}
+@media(max-width:760px){.prob-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.prob-grid{grid-template-columns:1fr}}
+
+/* ── SOLUTIONS ── */
+.sol-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.sol-card{background:var(--white);border-radius:var(--r);padding:30px 26px;
+  border-left:4px solid var(--sage);box-shadow:var(--sh)}
+.sol-card .s-ico{font-size:26px;margin-bottom:12px;display:block}
+.sol-card h3{font-size:17px;margin:0 0 9px}
+.sol-card p{font-size:13.5px;color:var(--muted);margin:0}
+@media(max-width:620px){.sol-grid{grid-template-columns:1fr}}
+
+/* ── WORKS ── */
+.works-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:30px}
+.wcard{background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);
+  transition:box-shadow .25s,transform .25s}
+.wcard:hover{box-shadow:var(--sh-h);transform:translateY(-3px)}
+/* visual area */
+.wv{padding:26px 22px 22px;border-bottom:1px solid var(--border);
+  position:relative;background:var(--ivory)}
+.wv.bg-sage{background:var(--sage-lt)}
+.wv.bg-pink{background:var(--pink)}
+.wv-label{position:absolute;top:12px;right:12px;font-size:10px;color:var(--muted);
+  background:rgba(255,255,255,.85);border:1px solid var(--border);
+  border-radius:100px;padding:3px 10px}
+/* flow diagram */
+.wflow{display:flex;align-items:stretch;gap:6px;flex-wrap:nowrap;justify-content:center}
+.wflow-step{flex:1;min-width:0;background:rgba(255,255,255,.88);
+  border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center}
+.wflow-step .wico{font-size:22px;display:block;margin-bottom:5px}
+.wflow-step .wlbl{font-size:10.5px;font-weight:700;line-height:1.35;color:var(--ink)}
+.wflow-arr{color:var(--sage);font-weight:700;font-size:14px;
+  flex-shrink:0;align-self:center;padding:0 1px}
+/* mini dashboard (work 6) */
+.mini-db{}
+.mini-kpi-row{display:flex;gap:7px;margin-bottom:11px}
+.mini-kpi{flex:1;background:rgba(255,255,255,.88);border:1px solid var(--border);
+  border-radius:9px;padding:9px 6px;text-align:center}
+.mini-kpi .kv{font-size:14px;font-weight:800;color:var(--sage);display:block}
+.mini-kpi .kl{font-size:9.5px;color:var(--muted)}
+.mini-chart-wrap{background:rgba(255,255,255,.88);border:1px solid var(--border);
+  border-radius:9px;padding:11px 12px}
+.mini-bars{display:flex;align-items:flex-end;gap:5px;height:52px}
+.mbar{flex:1;background:var(--sage);border-radius:3px 3px 0 0;opacity:.7}
+.mini-chart-lbl{font-size:9.5px;color:var(--muted);text-align:center;margin-top:5px}
+/* chat mockup (work 1) */
+.chat-mock{display:flex;flex-direction:column;gap:9px}
+.cmsg{max-width:82%;padding:9px 13px;border-radius:16px;font-size:11.5px;line-height:1.5}
+.cmsg.user{background:rgba(255,255,255,.88);border:1px solid var(--border);align-self:flex-end}
+.cmsg.bot{background:var(--sage);color:#fff;align-self:flex-start}
+.cmsg.note{background:rgba(255,255,255,.7);border:1px dashed var(--border);
+  color:var(--muted);font-size:10.5px;align-self:center;border-radius:8px;text-align:center}
+/* work content */
+.wc{padding:24px}
+.wtags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px}
+.wtag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.tself{background:var(--sage-lt);color:var(--sage)}
+.tdemo{background:var(--pink);color:#b05040}
+.wc h3{font-size:19px;margin:0 0 12px}
+.wproblem{background:var(--ivory);border-radius:var(--r-sm);padding:13px 15px;margin-bottom:15px}
+.wproblem .wpl{font-size:10px;font-weight:700;color:var(--sage);
+  letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px}
+.wproblem p{font-size:13px;color:var(--muted);margin:0}
+.wfeatures{margin:0 0 14px;padding:0;list-style:none}
+.wfeatures li{font-size:13px;padding:5px 0;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:8px}
+.wfeatures li:last-child{border-bottom:none}
+.wfeatures li::before{content:'✓';color:var(--sage);font-weight:700;flex-shrink:0;padding-top:1px}
+.wtech{font-size:11.5px;color:var(--muted);margin-bottom:16px}
+.wtech strong{color:var(--ink)}
+.wlinks{display:flex;gap:9px;flex-wrap:wrap}
+.wdisclaimer{font-size:12px;color:var(--muted);margin-top:44px;padding:18px 20px;
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r-sm);line-height:1.9}
+@media(max-width:760px){.works-grid{grid-template-columns:1fr}}
+
+/* ── PROCESS ── */
+.proc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.proc-step{background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:22px 14px;text-align:center}
+.pnum{display:inline-block;width:30px;height:30px;background:var(--sage-lt);
+  color:var(--sage);border-radius:50%;font-size:11px;font-weight:800;
+  line-height:30px;margin-bottom:11px}
+.proc-step .pico{font-size:22px;display:block;margin-bottom:9px}
+.proc-step h3{font-size:13.5px;margin:0 0 5px}
+.proc-step p{font-size:11.5px;color:var(--muted);margin:0}
+.proc-note{text-align:center;font-size:13px;color:var(--muted);margin-top:28px}
+@media(max-width:860px){
+  .proc-grid{grid-template-columns:repeat(3,1fr)}
+  .proc-step:nth-child(4){grid-column:1}
+  .proc-step:nth-child(5){grid-column:2}
+}
+@media(max-width:520px){
+  .proc-grid{grid-template-columns:1fr 1fr}
+  .proc-step:last-child{grid-column:1/-1}
+}
+
+/* ── PROFILE ── */
+.prof-inner{display:grid;grid-template-columns:260px 1fr;gap:56px;align-items:center}
+.prof-av{text-align:center}
+/* プロフィール画像: images/profile.jpg に画像を配置すると表示されます */
+.prof-img{width:190px;height:190px;border-radius:50%;object-fit:cover;
+  border:4px solid var(--sage-lt);margin:0 auto 14px}
+.prof-mono{width:190px;height:190px;border-radius:50%;background:var(--sage-lt);
+  border:4px solid var(--border);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;font-size:58px;font-weight:900;color:var(--sage);
+  font-style:italic;letter-spacing:-.03em}
+.prof-av p{font-size:12px;color:var(--muted)}
+.prof-copy .pname{font-size:14px;color:var(--muted);margin-bottom:18px;margin-top:0}
+.prof-copy p{font-size:14.5px;color:var(--muted)}
+.prof-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.prof-chips span{background:var(--sage-lt);color:var(--sage-dk);
+  border-radius:100px;padding:5px 13px;font-size:12px;font-weight:700}
+.prof-disc{margin-top:18px;font-size:12px;color:var(--muted);
+  border-left:2px solid var(--border);padding-left:12px;line-height:1.9}
+@media(max-width:720px){
+  .prof-inner{grid-template-columns:1fr;gap:28px}
+  .prof-av{margin-bottom:0}
+}
+
+/* ── FAQ ── */
+.faq-list{max-width:740px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;background:none;border:none;text-align:left;
+  padding:20px 0;font-size:15px;font-weight:700;color:var(--ink);
+  cursor:pointer;display:flex;justify-content:space-between;
+  align-items:center;gap:14px;font-family:inherit;transition:color .2s}
+.faq-q:hover{color:var(--sage)}
+.faq-ico{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  flex-shrink:0;transition:transform .25s;color:var(--sage)}
+.faq-item.open .faq-ico{transform:rotate(45deg)}
+.faq-a{display:none;padding:0 0 20px;font-size:14px;color:var(--muted);line-height:1.95}
+.faq-item.open .faq-a{display:block}
+
+/* ── CONTACT ── */
+.contact-panel{background:var(--white);border-radius:28px;padding:56px 44px;
+  text-align:center;border:1px solid var(--border);box-shadow:var(--sh);
+  max-width:700px;margin:0 auto}
+.contact-panel h2{font-size:clamp(22px,3vw,32px);margin:14px 0 16px;line-height:1.45}
+.contact-panel p{color:var(--muted);font-size:15px;margin:0 0 28px}
+.contact-actions{display:flex;justify-content:center;gap:13px;flex-wrap:wrap;margin-bottom:26px}
+.contact-info{font-size:13px;color:var(--muted);line-height:2.2}
+.contact-info a{color:var(--sage);text-decoration:none}
+.contact-info a:hover{text-decoration:underline}
+@media(max-width:520px){.contact-panel{padding:36px 20px}}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:30px 0;background:var(--ivory)}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;
+  gap:14px;flex-wrap:wrap}
+footer small,footer a{font-size:12px;color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--sage)}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <span class="brand-mark">n.</span>
+      <span>ぬっま <small>AI SYSTEM DESIGN</small></span>
+    </a>
+    <nav class="nav-links" id="nav">
+      <a onclick="closeMenu()" href="#about">できること</a>
+      <a onclick="closeMenu()" href="#works">制作実績</a>
+      <a onclick="closeMenu()" href="#process">制作の流れ</a>
+      <a onclick="closeMenu()" href="#faq">よくある質問</a>
+      <a onclick="closeMenu()" href="#contact" class="btn btn-p btn-sm nav-cta">相談してみる ↗</a>
+    </nav>
+    <button class="hmenu" id="hmenu" aria-label="メニュー" onclick="toggleMenu()">
+      <svg id="ico-menu" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="19" y2="6"/><line x1="3" y1="11" x2="19" y2="11"/><line x1="3" y1="16" x2="19" y2="16"/></svg>
+      <svg id="ico-close" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><line x1="4" y1="4" x2="18" y2="18"/><line x1="18" y1="4" x2="4" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ══ HERO ══════════════════════════════════════════ -->
+<main id="top">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">AI × BUSINESS AUTOMATION</span>
+      <h1>繰り返しの仕事を、<br><em>仕組み</em>で減らす。</h1>
+      <p class="lead">問い合わせ対応・資料検索・データ整理——<br>技術のことは全部お任せください。<br>業務の「面倒」を整理して、使いやすいAIシステムを形にします。</p>
+      <div class="hero-actions">
+        <a class="btn btn-p" href="#works">制作実績を見る →</a>
+        <a class="btn btn-o" href="#contact">まず相談してみる</a>
+      </div>
+      <span class="hero-note">掲載作品はすべて自主制作による開発事例です</span>
+    </div>
+    <div class="hero-visual">
+      <div class="hv-header">
+        <span class="wdots"><i></i><i></i><i></i></span>
+        <span>AI workflow</span>
+      </div>
+      <div class="hv-body">
+        <div class="hv-flow">
+          <div class="hv-node"><span class="ico">💬</span><b>お困りごと</b></div>
+          <span class="hv-arr">→</span>
+          <div class="hv-node"><span class="ico">⚙️</span><b>AIが処理</b></div>
+          <span class="hv-arr">→</span>
+          <div class="hv-node"><span class="ico">✨</span><b>業務が楽に</b></div>
+        </div>
+        <div class="hv-tags">
+          <span>✓ 技術知識不要</span>
+          <span>✓ 丁寧なヒアリング</span>
+          <span>✓ 使える形に</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROBLEMS ══════════════════════════════════════════ -->
+<section class="section pale" id="about">
+  <div class="wrap">
+    <div class="sh ctr">
+      <span class="eyebrow">WHAT I CAN HELP WITH</span>
+      <h2>こんな<span>「困った」</span>ありませんか？</h2>
+      <p>日々の小さな負担こそ、仕組みで変えられるかもしれません。</p>
+    </div>
+    <div class="prob-grid">
+      <div class="prob-card"><span class="p-ico">💬</span><h3>同じ質問への対応が毎日ある</h3><p>営業時間外の問い合わせや、定型的な質問に繰り返し答えている。</p></div>
+      <div class="prob-card"><span class="p-ico">📂</span><h3>必要な資料をいつも探している</h3><p>情報があちこちに散らばっていて、見つけるまでに時間がかかる。</p></div>
+      <div class="prob-card"><span class="p-ico">📧</span><h3>メールの整理・転記に手間がかかる</h3><p>受信したメールから情報を手作業でまとめる作業が発生している。</p></div>
+      <div class="prob-card"><span class="p-ico">📊</span><h3>売上や在庫をすぐに確認できない</h3><p>データが整理されておらず、状況を把握するのに時間がかかる。</p></div>
+      <div class="prob-card"><span class="p-ico">🔔</span><h3>問い合わせの見落とし・対応漏れが心配</h3><p>どこから来た問い合わせか整理できておらず、担当者への共有が遅れる。</p></div>
+      <div class="prob-card"><span class="p-ico">🔎</span><h3>社内の知識を共有しづらい</h3><p>ベテランのノウハウが属人化していて、質問されるたびに対応が必要。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOLUTIONS ══════════════════════════════════════════ -->
+<section class="section sage-pale">
+  <div class="wrap">
+    <div class="sh ctr">
+      <span class="eyebrow">SOLUTIONS</span>
+      <h2>AIで<span>解決できること</span></h2>
+      <p>技術の話より先に、何に困っているかを丁寧に整理します。</p>
+    </div>
+    <div class="sol-grid">
+      <div class="sol-card"><span class="s-ico">💬</span><h3>自動応答・チャットボット</h3><p>LINEやWebサイトから届く問い合わせに、AIが24時間自動で回答します。対応できない内容は担当者へ引き継ぐ仕組みも構築できます。</p></div>
+      <div class="sol-card"><span class="s-ico">🔎</span><h3>社内情報の検索・活用</h3><p>マニュアルや過去の資料を登録しておくと、質問するだけで必要な情報を探せます。SlackやLINEから使える仕組みにも対応します。</p></div>
+      <div class="sol-card"><span class="s-ico">⚙️</span><h3>データ整理・集計の自動化</h3><p>メール・CSV・フォームなどから必要な情報を自動で抽出・整理します。毎月の集計レポートをAIが自動生成する仕組みも構築できます。</p></div>
+      <div class="sol-card"><span class="s-ico">🔔</span><h3>通知・振り分けの自動化</h3><p>問い合わせの内容をAIが判断し、担当チャンネルへ自動で通知します。対応漏れの防止や、情報共有のスピードアップに役立ちます。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WORKS ══════════════════════════════════════════ -->
+<section class="section" id="works">
+  <div class="wrap">
+    <div class="sh">
+      <span class="eyebrow">SELECTED WORKS</span>
+      <h2>つくった仕組みを、<br><span>わかりやすくご紹介。</span></h2>
+      <p>「何ができるか」「どう役に立つか」を中心にまとめた自主制作事例です。</p>
+    </div>
+    <div class="works-grid" id="works-grid"></div>
+    <p class="wdisclaimer">
+      ※ 掲載作品はすべて学習・自主制作による開発事例です。実際の受託実績・顧客への導入実績ではありません。<br>
+      ※ 未検証の削減効果・架空の顧客事例は一切掲載していません。<br>
+      ※ 「仕組みのイメージ」と明記している図は実際の画面ではありません。
+    </p>
+  </div>
+</section>
+
+<!-- ══ PROCESS ══════════════════════════════════════════ -->
+<section class="section pale" id="process">
+  <div class="wrap">
+    <div class="sh ctr">
+      <span class="eyebrow">HOW I WORK</span>
+      <h2>制作の<span>進め方</span></h2>
+      <p>技術の話より先に、何に困っているかを丁寧に整理します。</p>
+    </div>
+    <div class="proc-grid">
+      <div class="proc-step"><span class="pnum">01</span><span class="pico">🤝</span><h3>ヒアリング</h3><p>困っていることや業務の流れを整理します</p></div>
+      <div class="proc-step"><span class="pnum">02</span><span class="pico">📋</span><h3>要件整理</h3><p>必要な機能と実現方法を検討します</p></div>
+      <div class="proc-step"><span class="pnum">03</span><span class="pico">💻</span><h3>開発・検証</h3><p>システムを制作し、動作を確認します</p></div>
+      <div class="proc-step"><span class="pnum">04</span><span class="pico">🔍</span><h3>動作確認</h3><p>想定した流れが機能するか検証します</p></div>
+      <div class="proc-step"><span class="pnum">05</span><span class="pico">📦</span><h3>納品・ご案内</h3><p>使い方をわかりやすくお伝えします</p></div>
+    </div>
+    <p class="proc-note">費用・期間のことも、まずはお気軽にご相談ください。</p>
+  </div>
+</section>
+
+<!-- ══ PROFILE ══════════════════════════════════════════ -->
+<section class="section" id="profile">
+  <div class="wrap">
+    <div class="prof-inner">
+      <div class="prof-av">
+        <img src="images/profile.png" alt="ぬっま プロフィールイラスト" class="prof-img">
+        <p>ぬっま / AIシステム開発</p>
+      </div>
+      <div class="prof-copy">
+        <span class="eyebrow">ABOUT ME</span>
+        <h2 style="font-size:clamp(24px,3vw,36px);margin:8px 0 6px">はじめまして、<br><span style="color:var(--sage)">ぬっま</span>です。</h2>
+        <p class="pname">飯沼 実生（いいぬま みお）｜AIシステム開発・業務自動化</p>
+        <p>「求められているシステムを、使える形にすること」を大切に、AIを活用した業務改善ツールを制作しています。</p>
+        <p>課題を整理し、必要な機能を考え、仕組みとして設計することが好きです。難しい言葉だけに頼らず、使う人の目線で丁寧に進めることを心がけています。</p>
+        <div class="prof-chips">
+          <span>業務課題の整理</span>
+          <span>AI連携システム</span>
+          <span>Webシステム開発</span>
+          <span>LINE / Slack 連携</span>
+        </div>
+        <p class="prof-disc">掲載している制作事例はすべて自主制作・学習目的の開発です。受託実績・顧客への導入実績ではありません。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══════════════════════════════════════════ -->
+<section class="section pale" id="faq">
+  <div class="wrap">
+    <div class="sh ctr">
+      <span class="eyebrow">FAQ</span>
+      <h2>よくある<span>ご質問</span></h2>
+    </div>
+    <div class="faq-list" id="faq-list"></div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══════════════════════════════════════════ -->
+<section class="section pink-pale" id="contact">
+  <div class="wrap">
+    <div class="contact-panel">
+      <span class="eyebrow">LET'S TALK</span>
+      <h2>その「困った」、<br>まずは整理するところから。</h2>
+      <p>「こんなことは自動化できる？」という段階でも大丈夫です。<br>業務の内容や目的に合わせて、実現方法を一緒に考えます。</p>
+      <div class="contact-actions">
+        <a class="btn btn-p" href="https://lin.ee/xjIc4MP" target="_blank" rel="noopener noreferrer">公式LINEで相談する ↗</a>
+        <a class="btn btn-o" href="mailto:suwacc1@gmail.com?subject=AIシステム制作のご相談">メールで問い合わせる</a>
+      </div>
+      <div class="contact-info">
+        メール：<a href="mailto:suwacc1@gmail.com">suwacc1@gmail.com</a><br>
+        公式LINE：<a href="https://lin.ee/xjIc4MP" target="_blank" rel="noopener noreferrer">友だち追加はこちら ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ══ FOOTER ══════════════════════════════════════════ -->
+<footer>
+  <div class="wrap footer-inner">
+    <div class="brand" style="font-size:15px">
+      <span class="brand-mark">n.</span>
+      <span style="margin-left:8px">ぬっま <small style="font-size:11px;color:var(--muted)">AI SYSTEM DESIGN</small></span>
+    </div>
+    <small>© <span id="yr"></span> ぬっま. All rights reserved.</small>
+    <a href="#top">ページ上部へ ↑</a>
+  </div>
+</footer>
+
+<script>
+// ── Works data ───────────────────────────────────────────
+// github: 公開済みリポジトリのURLを設定してください（privateの場合は空文字のまま）
+// demo: 公開済みデモのURLを設定してください（未デプロイの場合は空文字のまま）
+const works = [
+  {
+    id:'01',
+    title:'LINE AIチャットボット',
+    tags:[{label:'自主制作',cls:'tself'}],
+    problem:'営業時間外・繰り返しの問い合わせに毎回対応している',
+    visual:'chat',
+    bg:'bg-sage',
+    features:[
+      'よくある質問への24時間自動回答',
+      '回答できない内容は担当者へ自動通知',
+      'FAQ登録内容に基づいた応答生成',
+    ],
+    tech:'LINE Messaging API / Next.js / Claude AI',
+    github:'',
+    demo:'',
+  },
+  {
+    id:'02',
+    title:'社内文書検索AI',
+    tags:[{label:'自主制作',cls:'tself'}],
+    problem:'必要な資料がどこにあるかわからず、探すだけで時間がかかる',
+    visual:'flow',
+    flow:[
+      {ico:'📄',lbl:'資料を\n登録'},
+      {ico:'🔎',lbl:'質問を\n入力'},
+      {ico:'📖',lbl:'関連情報\nを表示'},
+      {ico:'🔗',lbl:'参照元\nも確認'},
+    ],
+    bg:'bg-pink',
+    features:[
+      '社内資料・マニュアルの一括登録',
+      '自然な言葉での質問検索',
+      '回答の根拠となる参照元ドキュメントの表示',
+    ],
+    tech:'RAG / ベクターDB / Next.js / AI API',
+    github:'',
+    demo:'',
+  },
+  {
+    id:'03',
+    title:'RAG ＋ Slack ナレッジBot',
+    tags:[{label:'自主制作',cls:'tself'}],
+    problem:'社内情報を探すためにツールを切り替えたり、詳しい人に毎回聞いている',
+    visual:'flow',
+    flow:[
+      {ico:'💬',lbl:'Slackで\n質問'},
+      {ico:'📚',lbl:'ナレッジを\n検索'},
+      {ico:'🤖',lbl:'Botが\n回答'},
+    ],
+    bg:'',
+    features:[
+      'Slackから直接社内情報を検索',
+      '登録済みナレッジをもとにした自動回答',
+      '複数資料を参照した統合回答の生成',
+    ],
+    tech:'Slack API / RAG / AI API',
+    github:'',
+    demo:'',
+  },
+  {
+    id:'04',
+    title:'LINE問い合わせ自動分類・Slack通知',
+    tags:[{label:'自主制作',cls:'tself'}],
+    problem:'LINEの問い合わせ内容を確認して、担当者へ手動で振り分けている',
+    visual:'flow',
+    flow:[
+      {ico:'📱',lbl:'LINEに\n問い合わせ'},
+      {ico:'🗂️',lbl:'AIが\n自動分類'},
+      {ico:'🔔',lbl:'担当チャンネル\nへ通知'},
+    ],
+    bg:'bg-sage',
+    features:[
+      '問い合わせ内容のAI自動カテゴリ分類',
+      '担当Slackチャンネルへのリアルタイム通知',
+      '問い合わせ内容の要約付き通知',
+    ],
+    tech:'LINE Messaging API / Supabase / Claude AI / Slack API',
+    github:'',
+    demo:'',
+  },
+  {
+    id:'05',
+    title:'Gmail情報取得・整理システム',
+    tags:[{label:'自主制作',cls:'tself'}],
+    problem:'メールから必要な情報を手作業で転記・整理する作業が発生している',
+    visual:'flow',
+    flow:[
+      {ico:'✉️',lbl:'Gmailから\n取得'},
+      {ico:'⚙️',lbl:'必要項目\nを抽出'},
+      {ico:'🗃️',lbl:'DBへ\n自動保存'},
+    ],
+    bg:'bg-pink',
+    features:[
+      '指定条件に合うメールの自動取得',
+      '必要な情報の抽出・構造化',
+      '重複データの自動検出・防止',
+    ],
+    tech:'Gmail API / データベース / AI API',
+    github:'',
+    demo:'',
+  },
+  {
+    id:'06',
+    title:'AI搭載 売上分析ダッシュボード',
+    tags:[{label:'自主制作',cls:'tself'},{label:'デモ公開中',cls:'tdemo'}],
+    problem:'売上データの集計・レポート作成に毎月時間がかかっている',
+    visual:'dashboard',
+    bg:'',
+    features:[
+      'ShopifyエクスポートCSVをアップロードするだけで分析開始',
+      '月別・商品別・カテゴリ別の自動集計・グラフ表示',
+      'Claude AIによる売上コメント・傾向分析の自動生成',
+    ],
+    tech:'Next.js / Claude API / Chart.js / CSV処理',
+    github:'',
+    demo:'https://sales-dashboard-ochre-kappa.vercel.app',
+  },
+];
+
+// ── FAQ data ──────────────────────────────────────────────
+const faqs = [
+  {
+    q:'技術的なことがわからなくても相談できますか？',
+    a:'はい、むしろ歓迎します。「こんなことを自動化したい」「毎日こんな手間がある」というお話から始めていただければ、必要な仕組みを一緒に整理します。技術用語を使わずに進めることも可能です。'
+  },
+  {
+    q:'費用はどのくらいかかりますか？',
+    a:'業務内容・必要な機能・利用するサービスによって異なります。まずご要望をお聞きした上でご提示しますので、お気軽にご相談ください。現時点ではお見積もりを無料でお受けしています。'
+  },
+  {
+    q:'開発期間はどれくらいかかりますか？',
+    a:'機能の範囲や仕様の確定状況によって変わります。シンプルな自動化であれば数週間程度のことも多いですが、要件整理の段階で目安をお伝えします。'
+  },
+  {
+    q:'完成後のサポート・保守対応はありますか？',
+    a:'対応可否・範囲・費用については案件ごとにご相談させてください。現時点で体制が整っていない部分もありますので、事前にご確認いただくことをお勧めします。'
+  },
+  {
+    q:'「自主制作」というのはどういう意味ですか？',
+    a:'掲載している制作事例は、実際の顧客から依頼を受けたものではなく、学習・技術検証を目的として自分で企画・開発したものです。受託実績・導入効果の実測値を示すものではありませんが、実際に動作する仕組みを構築・確認しています。'
+  },
+  {
+    q:'まず何を準備すればよいですか？',
+    a:'特に準備は必要ありません。「毎日こんな作業が大変」「こんな仕組みがあると楽になる」という気持ちだけで大丈夫です。公式LINEまたはメールで、困っていることを教えてください。'
+  },
+];
+
+// ── Render Works ──────────────────────────────────────────
+const escH = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeURL = s => /^https:\/\/[a-z0-9.-]+(?:\/[^\s]*)?$/i.test(String(s)) ? s : '';
+
+function buildVisual(w) {
+  if (w.visual === 'chat') {
+    return `<div class="chat-mock">
+      <div class="cmsg user">営業時間外なんですが、予約できますか？</div>
+      <div class="cmsg bot">ご質問ありがとうございます。<br>Web予約はいつでも受け付けています。</div>
+      <div class="cmsg user">料金を教えてください。</div>
+      <div class="cmsg bot">料金プランはこちらをご確認ください。<br>詳細は担当者へおつなぎします。</div>
+      <div class="cmsg note">複雑な内容は担当者へ自動で引き継ぎ</div>
+    </div>`;
+  }
+  if (w.visual === 'dashboard') {
+    return `<div class="mini-db">
+      <div class="mini-kpi-row">
+        <div class="mini-kpi"><span class="kv">¥830,500</span><span class="kl">総売上（デモデータ）</span></div>
+        <div class="mini-kpi"><span class="kv">76件</span><span class="kl">注文数</span></div>
+        <div class="mini-kpi"><span class="kv">¥10,927</span><span class="kl">平均注文額</span></div>
+      </div>
+      <div class="mini-chart-wrap">
+        <div class="mini-bars">
+          <div class="mbar" style="height:55%"></div>
+          <div class="mbar" style="height:72%"></div>
+          <div class="mbar" style="height:63%"></div>
+          <div class="mbar" style="height:88%"></div>
+          <div class="mbar" style="height:100%"></div>
+          <div class="mbar" style="height:78%"></div>
+        </div>
+        <div class="mini-chart-lbl">月別売上推移（架空ストア・デモデータ）</div>
+      </div>
+    </div>`;
+  }
+  // flow (default)
+  const steps = w.flow || [];
+  return `<div class="wflow">${steps.map((s,i) =>
+    `${i ? '<span class="wflow-arr">→</span>' : ''}
+     <div class="wflow-step">
+       <span class="wico">${escH(s.ico)}</span>
+       <span class="wlbl">${escH(s.lbl).replace(/\n/g,'<br>')}</span>
+     </div>`
+  ).join('')}</div>`;
+}
+
+function renderWorks() {
+  const grid = document.getElementById('works-grid');
+  grid.innerHTML = works.map(w => {
+    const tags = w.tags.map(t => `<span class="wtag ${t.cls}">${escH(t.label)}</span>`).join('');
+    const feats = w.features.map(f => `<li>${escH(f)}</li>`).join('');
+    const gh = safeURL(w.github);
+    const dm = safeURL(w.demo);
+    const links = [
+      dm ? `<a class="btn-sm" href="${escH(dm)}" target="_blank" rel="noopener noreferrer">デモを見る ↗</a>` : '',
+      gh ? `<a class="btn-sm" href="${escH(gh)}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>` : '',
+    ].filter(Boolean).join('');
+    // visual label
+    const isRealData = w.visual === 'dashboard';
+    const vlabel = isRealData ? '仕組みのイメージ（デモ公開中）' : '仕組みのイメージ';
+
+    return `<article class="wcard">
+      <div class="wv ${w.bg||''}">
+        <span class="wv-label">${escH(vlabel)}</span>
+        ${buildVisual(w)}
+      </div>
+      <div class="wc">
+        <div class="wtags"><span class="wtag" style="background:var(--ivory);color:var(--muted);border:1px solid var(--border)">WORK ${escH(w.id)}</span>${tags}</div>
+        <h3>${escH(w.title)}</h3>
+        <div class="wproblem">
+          <span class="wpl">解決できる業務課題</span>
+          <p>${escH(w.problem)}</p>
+        </div>
+        <ul class="wfeatures">${feats}</ul>
+        <p class="wtech"><strong>使用技術：</strong>${escH(w.tech)}</p>
+        ${links ? `<div class="wlinks">${links}</div>` : ''}
+      </div>
+    </article>`;
+  }).join('');
+}
+
+// ── Render FAQ ────────────────────────────────────────────
+function renderFAQ() {
+  const list = document.getElementById('faq-list');
+  list.innerHTML = faqs.map((f,i) => `
+    <div class="faq-item" id="faq-${i}">
+      <button class="faq-q" onclick="toggleFAQ(${i})">
+        <span>Q. ${escH(f.q)}</span>
+        <span class="faq-ico">+</span>
+      </button>
+      <div class="faq-a">${escH(f.a)}</div>
+    </div>`
+  ).join('');
+}
+
+function toggleFAQ(i) {
+  const item = document.getElementById('faq-'+i);
+  item.classList.toggle('open');
+}
+
+// ── Mobile menu ───────────────────────────────────────────
+function toggleMenu() {
+  const nav = document.getElementById('nav');
+  const m = document.getElementById('ico-menu');
+  const c = document.getElementById('ico-close');
+  const open = nav.classList.toggle('open');
+  m.style.display = open ? 'none' : 'block';
+  c.style.display = open ? 'block' : 'none';
+}
+function closeMenu() {
+  const nav = document.getElementById('nav');
+  const m = document.getElementById('ico-menu');
+  const c = document.getElementById('ico-close');
+  nav.classList.remove('open');
+  m.style.display = 'block';
+  c.style.display = 'none';
+}
+
+// ── Init ──────────────────────────────────────────────────
+document.getElementById('yr').textContent = new Date().getFullYear();
+renderWorks();
+renderFAQ();
+</script>
+</body>
+</html>
