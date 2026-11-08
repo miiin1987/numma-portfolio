@@ -315,7 +315,7 @@ footer a:hover{color:var(--sage)}
     <div class="hero-copy">
       <span class="eyebrow">AI × BUSINESS AUTOMATION</span>
       <h1>繰り返しの仕事を、<br><em>仕組み</em>で減らす。</h1>
-      <p class="lead">問い合わせ対応・資料検索・データ整理——<br>技術のことは全部お任せください。<br>業務の「面倒」を整理して、使いやすいAIシステムを形にします。</p>
+      <p class="lead">問い合わせ対応・資料検索・データ整理——<br>技術的なことがわからなくても大丈夫です。<br>業務の「面倒」を整理して、使いやすいAIシステムを形にします。</p>
       <div class="hero-actions">
         <a class="btn btn-p" href="#works">制作実績を見る →</a>
         <a class="btn btn-o" href="#contact">まず相談してみる</a>
@@ -558,22 +558,22 @@ const works = [
   },
   {
     id:'04',
-    title:'LINE問い合わせ自動分類・Slack通知',
+    title:'Gmail・LINE問い合わせ自動分類',
     tags:[{label:'自主制作',cls:'tself'}],
-    problem:'LINEの問い合わせ内容を確認して、担当者へ手動で振り分けている',
+    problem:'GmailとLINEから届く問い合わせを確認して、担当者へ手動で振り分けている',
     visual:'flow',
     flow:[
-      {ico:'📱',lbl:'LINEに\n問い合わせ'},
+      {ico:'📧',lbl:'Gmail /\nLINEで受信'},
       {ico:'🗂️',lbl:'AIが\n自動分類'},
       {ico:'🔔',lbl:'担当チャンネル\nへ通知'},
     ],
     bg:'bg-sage',
     features:[
+      'GmailとLINEの両方から問い合わせを取得',
       '問い合わせ内容のAI自動カテゴリ分類',
       '担当Slackチャンネルへのリアルタイム通知',
-      '問い合わせ内容の要約付き通知',
     ],
-    tech:'LINE Messaging API / Supabase / Claude AI / Slack API',
+    tech:'LINE Messaging API / Gmail API / Supabase / Claude AI / Slack API',
     github:'https://github.com/miiin1987/inquiry-hub',
     demo:'',
   },
