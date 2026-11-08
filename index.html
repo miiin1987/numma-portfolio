@@ -65,6 +65,9 @@ img{max-width:100%;height:auto;display:block}
 .nav-links a{text-decoration:none;color:var(--muted);transition:color .2s}
 .nav-links a:hover{color:var(--sage)}
 .nav-cta{margin-left:4px}
+.nav-gh{display:inline-flex;align-items:center;color:var(--muted);transition:color .2s;flex-shrink:0}
+.nav-gh:hover{color:var(--ink)}
+.nav-gh svg{width:18px;height:18px;display:block}
 .hmenu{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--ink);line-height:1}
 .hmenu svg{display:block}
 @media(max-width:860px){
@@ -293,6 +296,9 @@ footer a:hover{color:var(--sage)}
       <a onclick="closeMenu()" href="#works">制作実績</a>
       <a onclick="closeMenu()" href="#process">制作の流れ</a>
       <a onclick="closeMenu()" href="#faq">よくある質問</a>
+      <a href="https://github.com/miiin1987" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="nav-gh">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
       <a onclick="closeMenu()" href="#contact" class="btn btn-p btn-sm nav-cta">相談してみる ↗</a>
     </nav>
     <button class="hmenu" id="hmenu" aria-label="メニュー" onclick="toggleMenu()">
@@ -431,6 +437,12 @@ footer a:hover{color:var(--sage)}
           <span>Webシステム開発</span>
           <span>LINE / Slack 連携</span>
         </div>
+        <div style="margin-top:16px">
+          <a class="btn-sm" href="https://github.com/miiin1987" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="flex-shrink:0" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            GitHubプロフィールを見る ↗
+          </a>
+        </div>
         <p class="prof-disc">掲載している制作事例はすべて自主制作・学習目的の開発です。受託実績・顧客への導入実績ではありません。</p>
       </div>
     </div>
@@ -498,7 +510,7 @@ const works = [
       'FAQ登録内容に基づいた応答生成',
     ],
     tech:'LINE Messaging API / Next.js / Claude AI',
-    github:'',
+    github:'https://github.com/miiin1987/line-ai-bot',
     demo:'',
   },
   {
@@ -520,7 +532,7 @@ const works = [
       '回答の根拠となる参照元ドキュメントの表示',
     ],
     tech:'RAG / ベクターDB / Next.js / AI API',
-    github:'',
+    github:'https://github.com/miiin1987/rag-search',
     demo:'',
   },
   {
