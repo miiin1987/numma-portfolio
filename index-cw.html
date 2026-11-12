@@ -588,7 +588,7 @@ dialog#reader::backdrop{background:rgba(43,42,51,.45);backdrop-filter:blur(3px)}
     ct.textContent='ご依頼・ご相談は、'+(names[from]||ct.dataset.list)+'のメッセージからお送りください。内容を確認次第、できる限り早めにご返信いたします。';
   }
   document.querySelectorAll('[data-xlink]').forEach(function(a){
-    a.href = MODE==='direct' ? a.dataset.xdirect : a.dataset.xplatform + (names[from] ? '?from='+from : '');
+    a.href = MODE==='direct' ? a.dataset.xdirect : a.dataset.xplatform + ({cw:'cw.html',lancers:'lancers.html'}[from] || (names[from] ? '?from='+from : ''));
   });
   document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){
     var t=document.getElementById(b.dataset.copy),x=t.textContent.trim(),orig=b.textContent;
