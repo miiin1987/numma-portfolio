@@ -4,10 +4,8 @@
 `index.html` をブラウザで開いてください。依存ライブラリ不要の静的サイトです。
 
 ## 更新方法
-`index.html` 末尾の `const projects` 配列で作品情報を編集します。
-各作品の `github` に公開済みの実在するGitHubリポジトリURLを設定するとリンクが表示されます。
-案件⑧は完成後、実装・動作確認済みの内容に差し替えてください。
-お問い合わせ欄にはメール（suwaccc1@gmail.com）と公式LINE（https://lin.ee/xjIc4MP）を設定済みです。LINEのプロフィール・チャット設定はLINE Official Account Manager側で確認してください。
+作品情報は `index.html` と `index-cw.html` の制作事例（カードと詳細の template）に直接書いています。両方のファイルを同じ内容にそろえて更新してください。
+`index.html` は公式LINE・メールを載せた版、`index-cw.html` はクラウドワークス・ランサーズ・ココナラ経由の依頼に絞った版です（どちらも末尾に `?from=cw` / `?from=lancers` / `?from=coconala` を付けると、そのサービスだけを案内します）。プロフィールURLはページ下部のスクリプトの `PROFILE` で設定します。LINEのプロフィール・チャット設定はLINE Official Account Manager側で確認してください。
 
 ## 公開
 GitHubにこのフォルダをアップロードし、Vercelで静的サイトとしてデプロイできます。ビルドコマンドは不要です。
